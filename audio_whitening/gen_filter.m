@@ -25,5 +25,5 @@ function [filter, frequency] = gen_filter(audio, fs, resample_rate)
 
     % create filter from power
     filter = 1 ./ (sqrt(new_power));
-    plot(frequency,filter)
+    % plot(frequency,filter)
 end
