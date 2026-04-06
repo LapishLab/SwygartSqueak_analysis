@@ -1,29 +1,13 @@
-% loop through all the audio in datastar, (or in links?), filter and place next to original audio?
-% rename original or filtered?
-% if renaming original, then we need to swap out audio links
-
-% For now, lets just test on a single audio file
-
-
-% %%
-% root = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/Prat_Urgency/audio/";
-% % folder = root+"validation/";
-% folder = root+"test/";
-% files = {dir(folder+"*.wav").name};
-% [~, files] = isSymbolicLink(fullfile(folder,files));
-% 
-% %%
-% for i=1:length(files)
-%     whiten_and_resave(files(i))
-% end
-% whiten_and_resave("/datastar/audio_rec/noise_test/2CAP.wav","/datastar/audio_rec/noise_test/2CAP_whitened.flac")
 function whiten_and_resave(wav,new_name)
 [original_audio, fs] = audioread(wav); % Read the original audio file
 
 frac = 0.1;
+fprintf('Getting background \n')
 background = get_background(original_audio, fs, frac);
 resample_rate = 25;
+fprintf('Generating filter \n')
 filter = gen_filter(background, fs, resample_rate); % generate filter
+fprintf('Applying filter \n')
 audio_out = apply_filter(original_audio, filter);
 
 %normalize audio
@@ -43,7 +27,7 @@ comment = sprintf(['%s\nSpectrally whitened using inverse power spectra' ...
     ' on %s'], info.Comment, string(datetime('now')));
 %% save audio
 
-
+fprintf('Saving Audio \n')
 audiowrite(new_name, audio_out, fs, Comment=comment, Artist=info.Artist);
 
 end
