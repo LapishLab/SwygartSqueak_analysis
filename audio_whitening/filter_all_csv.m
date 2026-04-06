@@ -13,19 +13,25 @@ function filter_all_csv(csvPath)
     new_names = fullfile(folder,name+"_whitened.flac");
 
     for i = 1:height(T)
-        audioFile = T.audio_file_path{i};
+        audioFile = T.link_name{i};
+        if isempty(audioFile)
+            fprintf('No entry for link_name for row %i, skipping\n', i)
+            continue
+        end
         if ~isfile(audioFile)
-            warning('Invalid audio path at row %d: %s', i, audioFile);
+            warning('Invalid audio path at row %d: %s \n', i, audioFile);
             continue
         end
 
-        if ~exist(new_names(i),'file')
+        if exist(new_names(i),'file')
+            fprintf('File already exists, skipping: %s  \n', new_names(i))
+        else
+            fprintf('Whitening: %s \n', audioFile)
+            T.whitened_path{i} = new_names(i);
             whiten_and_resave(audioFile, new_names(i));
+            fprintf('Completed %i/%i: Re-saving %s \n', i, height(T), csvPath)
+            T.whitened_path{i} = new_names(i);
+            writetable(T,csvPath)
         end
-        T.whitened_path{i} = new_names(i);
-        disp(i)
-        % title(num2str(i))
-        % pause(0.1)
-        writetable(T,csvPath)
     end
 end
