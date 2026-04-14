@@ -5,18 +5,36 @@ arguments
     output_folder {mustBeTextScalar}; % Where to save combined session data (1 file and 1 row in csv for each session)
     opts.common_variables ={'subject','sex','treatment','issueTime', 'strain', 'scentDays'};
 end
+
+    %% Load per-audio-file table (from input csv file)
     t = readtable(csv_path, Delimiter=',');
     t = t(~cellfun(@isempty, t.split), :); % remove audio files not in test/validation/train
 
-    [~,id,~] = fileparts(t.link_name);
+    [~,id,~] = fileparts(t.link_name); % Get ID from linkname % TODO: Save unique ID when first generating this table and use for all row references
     t.id = string(id);
+
+    % Add prediction file paths to each row of table
+    prediction_files = get_files_with_extension(predictions_folder, {'.mat'});
+    for i=1:height(t)
+        is_match = contains(prediction_files, t.id(i));
+        if sum(is_match)>1
+            error("More than 1 matching prediction file found for %s", t.id(i))
+        elseif sum(is_match)==0
+            warning("Can't find prediction file for %s", t.id(i))
+        else
+            t.prediction_path(i) = prediction_files(is_match);
+        end
+        
+    end
+
+    % Drop any rows with missing prediction files
+    t(ismissing(t.prediction_path), :) = [];
     
 
-    % Prepare a table to keep track of export progress
+    %% Prepare per-session table (save as export.csv)
     output_csv = fullfile(output_folder, "export.csv");
     output_table = table();
     output_table.session_path = unique(fileparts(t.audio_file_path));
-    
 
     % Which variables from audio table should be carried into export table
     temp = cell(height(output_table),length(opts.common_variables));
@@ -37,16 +55,9 @@ end
         end
         output_table{i, opts.common_variables} = table2cell(common_vals);
 
-        % Get list of "expected" detection files for the session
-        session_mats = fullfile(predictions_folder, t.id(in_session) + ".mat");
-
-        if any(~cellfun(@exist, session_mats))
-            warning("Missing detection files for session: " + session);
-            continue;
-        end
 
         % Merge these detection files and save at export mat
-        output_table.export_path(i) = export_calls(session_mats, output_folder);
+        output_table.export_path(i) = export_calls(t.prediction_path(in_session), output_folder);
 
         % Save the table of export info
         writetable(output_table, output_csv, Delimiter = ',');
