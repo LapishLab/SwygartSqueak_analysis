@@ -31,7 +31,7 @@ for i=1:length(session_mats)
     d.Calls = filter_calls(d.Calls);
     
     % get ridges
-    [d.Calls.ridge_time, d.Calls.ridge_frequency, d.Calls.ridge_amp,] = detect_ridge(d.Calls, d.audiodata.Filename);
+    d.Calls = detect_ridge(d.Calls, d.audiodata.Filename);
     
     % shift Box and ridge time by offset
     d.Calls.Box(:,1) = d.Calls.Box(:,1) + t.file_start(i);
