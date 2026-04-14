@@ -28,7 +28,7 @@ for i=1:length(session_mats)
 
     % load and filter calls
     d=load(session_mats(i));
-    d = filter_calls(d);
+    d.Calls = filter_calls(d.Calls);
     
     % get ridges
     [d.Calls.ridge_time, d.Calls.ridge_frequency, d.Calls.ridge_amp,] = detect_ridge(d.Calls, d.audiodata.Filename);
