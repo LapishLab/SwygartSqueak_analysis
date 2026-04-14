@@ -45,8 +45,10 @@ fprintf("\n")
 all_prediction = cat(1, all_prediction{:});
 
 %% Remove overlapping boxes (may want to do on a per label basis)
-[~,~,inds] = selectStrongestBbox(all_prediction.Box, all_prediction.Score, OverlapThreshold=0);
-all_prediction = all_prediction(inds,:);
+if ~isempty(all_prediction)
+    [~,~,inds] = selectStrongestBbox(all_prediction.Box, all_prediction.Score, OverlapThreshold=0);
+    all_prediction = all_prediction(inds,:);
+end
 
  
 %% Save calls and audioinfo in a struct
