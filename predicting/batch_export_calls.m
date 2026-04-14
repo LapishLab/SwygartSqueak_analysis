@@ -28,14 +28,14 @@ end
         session = output_table.session_path{i};
         in_session = contains(t.audio_file_path, session);
 
-        common_vals = t(in_session,common_variables);
+        common_vals = t(in_session,opts.common_variables);
         common_vals = unique(common_vals);
         
         if height(common_vals) > 1
             warning("More than 1 unique variable for session, skipping")
             continue
         end
-        output_table{i, common_variables} = table2cell(common_vals);
+        output_table{i, opts.common_variables} = table2cell(common_vals);
 
         % Get list of "expected" detection files for the session
         session_mats = fullfile(predictions_folder, t.id(in_session) + ".mat");
