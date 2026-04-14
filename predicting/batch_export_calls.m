@@ -49,7 +49,7 @@ end
         output_table.export_path(i) = export_calls(session_mats, output_folder);
 
         % Save the table of export info
-        writetable(output_table, output_csv);
+        writetable(output_table, output_csv, Delimiter = ',');
 
         fprintf("Completed file %i/%i \n", i,height(output_table))
     end
