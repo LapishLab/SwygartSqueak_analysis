@@ -29,17 +29,19 @@ for i=1:length(session_mats)
     % load and filter calls
     d=load(session_mats(i));
     d.Calls = filter_calls(d.Calls);
-    
-    % get ridges
-    d.Calls = detect_ridge(d.Calls, d.audiodata.Filename);
-    
-    % shift Box and ridge time by offset
-    d.Calls.Box(:,1) = d.Calls.Box(:,1) + t.file_start(i);
-    add_offset = @(x) x + t.file_start(i);
-    d.Calls.ridge_time = cellfun(add_offset, d.Calls.ridge_time, 'UniformOutput', false);
 
-    % Save the audio index
-    d.Calls.file_index = repmat(i, height(d.Calls),1);
+    if ~isempty(d.Calls)
+        % get ridges
+        d.Calls = detect_ridge(d.Calls, d.audiodata.Filename);
+        
+        % shift Box and ridge time by offset
+        d.Calls.Box(:,1) = d.Calls.Box(:,1) + t.file_start(i);
+        add_offset = @(x) x + t.file_start(i);
+        d.Calls.ridge_time = cellfun(add_offset, d.Calls.ridge_time, 'UniformOutput', false);
+    
+        % Save the audio index
+        d.Calls.file_index = repmat(i, height(d.Calls),1);
+    end
         
     % Save the Calls and file info
     all_calls{i} = d.Calls;
