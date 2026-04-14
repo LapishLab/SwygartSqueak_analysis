@@ -13,7 +13,7 @@ end
     
 
     % Prepare a table to keep track of export progress
-    output_csv = fullfile(output_folder, "Export.csv");
+    output_csv = fullfile(output_folder, "export.csv");
     output_table = table();
     output_table.session_path = unique(fileparts(t.audio_file_path));
     
