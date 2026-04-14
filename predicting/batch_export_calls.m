@@ -1,4 +1,10 @@
-function output_table = batch_export_calls(predictions_folder, csv_path, output_folder)
+function output_table = batch_export_calls(predictions_folder, csv_path, output_folder, opts)
+arguments
+    predictions_folder {mustBeTextScalar}; % Path to directory containing detection files (1 per audio file)
+    csv_path {mustBeTextScalar}; % Path CSV file keeping track of experimental variables and original data path (1 row per audio file)
+    output_folder {mustBeTextScalar}; % Where to save combined session data (1 file and 1 row in csv for each session)
+    opts.common_variables ={'subject','sex','treatment','issueTime', 'strain', 'scentDays'};
+end
     t = readtable(csv_path, Delimiter=',');
     t = t(~cellfun(@isempty, t.split), :); % remove audio files not in test/validation/train
 
@@ -13,11 +19,8 @@ function output_table = batch_export_calls(predictions_folder, csv_path, output_
     
 
     % Which variables from audio table should be carried into export table
-    % TODO: make more robust (maybe this should be input argument?)
-    common_variables = {'subject','sex','treatment','issueTime'};
-
-    temp = cell(height(output_table),length(common_variables));
-    temp = cell2table(temp, "VariableNames",common_variables);
+    temp = cell(height(output_table),length(opts.common_variables));
+    temp = cell2table(temp, "VariableNames",opts.common_variables);
     output_table = cat(2,output_table, temp);
     
     for i=1:height(output_table)
