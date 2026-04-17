@@ -48,6 +48,19 @@ for i=1:length(session_mats)
     t.file_stop(i) = t.file_start(i) + d.audiodata.Duration;
     t.audiodata{i} = d.audiodata;
 end
+
+%identify empty cell arrays/files that don't have any squeaks
+no_squeaks = cellfun(@isempty, all_calls);
+
+%Removes any empty files with no squeaks 
+if any(cellfun(@isempty, all_calls))
+    empty_files = session_mats(no_squeaks);
+    fprintf('No squeaks in file %s\n', empty_files{:})
+    %remove the empty calls file and the file identifier from t
+    all_calls = all_calls(~no_squeaks);
+    t = t(~no_squeaks,:);
+end 
+
 all_calls = cat(1,all_calls{:});
 
 %% TODO check that there are not gaps between files
