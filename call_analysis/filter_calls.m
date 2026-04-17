@@ -9,6 +9,10 @@ function calls = filter_calls(calls, opts)
         opts.include_non_usv logical = false; % Should calls with labels other than USV be included?
     end
 
+    if isempty(calls)
+        return;
+    end
+
     % perform various checks
     calls = calls(calls.Box(:,3) > opts.min_duration, :);
     calls = calls(calls.Score > opts.min_score, :);
