@@ -9,7 +9,6 @@ function stats = usv_stats(folder)
     dur = calls.Box(:,3) * 1000; % duration in ms
     bandwidth = calls.Box(:,4); % bandwidth in kHz
     min_freq = calls.Box(:,2);
-    peak_freq = min_freq + bandwidth;
     middle_freq = min_freq + bandwidth ./ 2;
     
 
@@ -17,7 +16,9 @@ function stats = usv_stats(folder)
     stats.avg_duration = mean(dur);
     stats.total_duration = sum(dur);
     stats.bandwidth = mean(bandwidth);
-    stats.avgPeakFreq = mean(peak_freq);
+    stats.middle_freq = mean(middle_freq);
+    stats.freq_min = min(middle_freq);
+    stats.freq_max = max(middle_freq);
 
     figure(1); clf
     histogram(dur)
@@ -26,10 +27,6 @@ function stats = usv_stats(folder)
     figure(2); clf
     histogram(bandwidth)
     xlabel('Bandwith (kHz)')
-
-    figure(3); clf
-    histogram(peak_freq)
-    xlabel('Peak Frequency (kHz)')
 
     figure(4); clf
     histogram(middle_freq)
