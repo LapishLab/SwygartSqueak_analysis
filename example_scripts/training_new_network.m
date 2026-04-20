@@ -14,13 +14,13 @@ settings = spectrogram_settings();
 %% Create training images
 det = load_all_detection(train);
 det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
-det = filter_all_calls(det);
+det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
 summary(cat(1, det.Calls{:}).Type)
 % im_train = create_training_images(det,train_img,settings);
 
 det = load_all_detection(validate);
 det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
-det = filter_all_calls(det);
+det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
 summary(cat(1, det.Calls{:}).Type)
 % im_val = create_training_images(det,validate_img,settings);
 %% Make a fresh detector
@@ -59,12 +59,5 @@ isUSV = contains(label, 'USV');
 label(isUSV) = 'USV';
 label(~isUSV) = 'noise';
 calls.Type = categorical(label);
-end
-
-function det = filter_all_calls(det)
-for i=1:height(det)
-    d = table2struct(det(i,:));
-    d = filter_calls(d, include_non_usv=true, include_rejected=true);
-    det{i,:} = struct2cell(d)';
 end
 end
