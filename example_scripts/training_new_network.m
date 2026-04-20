@@ -30,7 +30,7 @@ det = load_all_detection(det_path);
 det.Calls = uniform_call_labels(det.Calls, labels);
 det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
 summary(cat(1, det.Calls{:}).Type)
-create_training_images(det,img_path_val, blank_YOLOX.settings);
+im_val = create_training_images(det,img_path_val, blank_YOLOX.settings);
 
 %% Train the detector
 network = train_detector(img_path_train, img_path_val, net_path, save_path=net_path);
