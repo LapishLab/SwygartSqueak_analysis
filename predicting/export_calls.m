@@ -19,6 +19,8 @@ start_time = t.file_time(1);
 t.file_start = seconds(t.file_time - start_time);
 t.file_stop = nan(height(t),1); % Fill in file stop time after loading audiodata
 
+t.num_calls = nan(height(t), 1);
+
 all_calls = cell(length(session_mats),1);
 for i=1:length(session_mats)
     if(~exist(session_mats(i), 'file'))
@@ -29,6 +31,7 @@ for i=1:length(session_mats)
     % load and filter calls
     d=load(session_mats(i));
     d.Calls = filter_calls(d.Calls);
+    t.num_calls(i) = height(d.Calls);
 
     if ~isempty(d.Calls)
         % get ridges
