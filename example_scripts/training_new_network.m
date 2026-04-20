@@ -1,62 +1,50 @@
-clear
-% net = "/home/lapishla/Documents/GitHub/DeepSqueak/Networks/YOLOX2026-02-26_08-17-26.mat";
-% train = "/home/lapishla/Desktop/training/training_images/";
-% validate = "/home/lapishla/Desktop/training/validation_images/";
+%% All paths
+net_path = "/home/lapishla/Documents/GitHub/DeepSqueak/Networks/YOLOX_rap.mat";
 
-train = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/Prat_Urgency/detection_files/train/";
-validate = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/Prat_Urgency/detection_files/validation/";
+% Allow for more than 1 manual curation path
+man_curation_path = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/Prat_Urgency/detection_files/";
+audio_root = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/Prat_Urgency/audio/";
 
-train_img = "/home/lapishla/Desktop/training_images/train";
-validate_img = "/home/lapishla/Desktop/training_images/validation";
-
-settings = spectrogram_settings();
-
-%% Create training images
-det = load_all_detection(train);
-det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
-det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
-summary(cat(1, det.Calls{:}).Type)
-im_train = create_training_images(det,train_img,settings);
-
-det = load_all_detection(validate);
-det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
-det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
-summary(cat(1, det.Calls{:}).Type)
-im_val = create_training_images(det,validate_img,settings);
+train_img_root = "/home/lapishla/Documents/training_images/RAP/";
+predictions_path = "/home/lapishla/Documents/predictions/RAP/";
 %% Make a fresh detector
-% im_val = load(fullfile(validate_img, 'img_table.mat'));
-% im_train = load(fullfile(train_img, 'img_table.mat'));
-labels=unique(cat(1, im_val.TTable.Labels{:}, im_train.TTable.Labels{:}));
-net = "/home/lapishla/Documents/GitHub/DeepSqueak/Networks/freshYOLOX.mat";
-generate_blank_YOLOX(net, settings, labels);
+labels = "USV";
+settings = spectrogram_settings();
+blank_YOLOX = generate_blank_YOLOX(net_path, settings, labels);
+
+%% Create training images (for training data)
+det_path = fullfile(man_curation_path, 'train');
+img_path_train = fullfile(train_img_root, 'train');
+
+det = load_all_detection(det_path);
+det.Calls = uniform_call_labels(det.Calls, labels);
+det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
+summary(cat(1, det.Calls{:}).Type)
+create_training_images(det,img_path_train, blank_YOLOX.settings);
+
+%% Create training images (for validation data)
+det_path = fullfile(man_curation_path, 'validation');
+img_path_val = fullfile(train_img_root, 'validation');
+
+det = load_all_detection(det_path);
+det.Calls = uniform_call_labels(det.Calls, labels);
+det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
+summary(cat(1, det.Calls{:}).Type)
+create_training_images(det,img_path_val, blank_YOLOX.settings);
+
 %% Train the detector
-network = train_detector(train_img, validate_img, net);
+network = train_detector(img_path_train, img_path_val, net_path, save_path=net_path);
+
 %% Run validation on the generated images
 [score,details,l] = detect_pregenerated_images(network.detector,im_val);
-%% run detector
-network = load("/home/lapishla/Documents/GitHub/DeepSqueak/Networks/YOLOX_noise_label.mat");
-% network.settings = spectrogram_settings();
-%%
-%prediction_output = "/home/lapishla/Desktop/Prat_all_predictions/";
-prediction_output = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/scentEtOH_urgencyDD/audio/validation/";
-network = load("/home/lapishla/Documents/GitHub/DeepSqueak/Networks/YOLOX3_2026-03-03_09-31-34.mat");
-network.settings = spectrogram_settings();
-audio_root = "/home/lapishla/Documents/GitHub/DeepSqueak-Network-Performance/detection/human_curated/scentEtOH_urgencyDD/audio/";
-%%
-audio_folder = audio_root + "train/";
-batch_detect_calls(audio_folder, prediction_output, network)
-%%
-audio_folder = audio_root + "test/";
-batch_detect_calls(audio_folder, prediction_output, network)
-%%
-audio_folder = audio_root + "validation/";
-batch_detect_calls(audio_folder, prediction_output, network)
-%
 
-function calls = merge_types(calls)
-label = string(calls.Type);
-isUSV = contains(label, 'USV');
-label(isUSV) = 'USV';
-label(~isUSV) = 'noise';
-calls.Type = categorical(label);
-end
+%% run detector
+audio_folder = audio_root + "train/";
+batch_detect_calls(audio_folder, predictions_path, network)
+
+audio_folder = audio_root + "test/";
+batch_detect_calls(audio_folder, predictions_path, network)
+
+audio_folder = audio_root + "validation/";
+batch_detect_calls(audio_folder, predictions_path, network)
+
