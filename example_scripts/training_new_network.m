@@ -16,13 +16,13 @@ det = load_all_detection(train);
 det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
 det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
 summary(cat(1, det.Calls{:}).Type)
-% im_train = create_training_images(det,train_img,settings);
+im_train = create_training_images(det,train_img,settings);
 
 det = load_all_detection(validate);
 det.Calls = cellfun(@merge_types, det.Calls, UniformOutput=false);
 det.Calls = cellfun(@filter_calls, det.Calls, UniformOutput=false);
 summary(cat(1, det.Calls{:}).Type)
-% im_val = create_training_images(det,validate_img,settings);
+im_val = create_training_images(det,validate_img,settings);
 %% Make a fresh detector
 % im_val = load(fullfile(validate_img, 'img_table.mat'));
 % im_train = load(fullfile(train_img, 'img_table.mat'));
@@ -59,5 +59,4 @@ isUSV = contains(label, 'USV');
 label(isUSV) = 'USV';
 label(~isUSV) = 'noise';
 calls.Type = categorical(label);
-end
 end
