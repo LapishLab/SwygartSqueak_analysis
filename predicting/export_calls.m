@@ -9,7 +9,7 @@ t = table();
 
 %% Get table of mat files and when they start
 [~,t.id,~] = fileparts(session_mats);
-id_split = split(t.id, "_");
+id_split = split(t.id, "_", 2);
 time_str = id_split(:,1) + "_" + id_split(:,2);
 t.file_time = datetime(time_str, "InputFormat", "yyyyMMdd_HHmmss");
 t = sortrows(t,"file_time","ascend");
