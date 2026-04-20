@@ -56,7 +56,14 @@ end
 no_squeaks = cellfun(@isempty, all_calls);
 all_calls = cat(1,all_calls{~no_squeaks});
 
-%% TODO check that there are not gaps between files
+%% Check if large gaps (missing files)
+gap_thresh = 6; % Threshold for gap between files (seconds) before throwing warning
+gaps = t.file_start(2:end) - t.file_stop(1:end-1);
+bad_gaps = find(gaps>gap_thresh);
+if ~isempty(bad_gaps)
+    mesg = t.id(bad_gaps) + ": gap = " +  string(gaps(bad_gaps));
+    warning("The following files have large gaps %s\n ",  strjoin(mesg, ', '));
+end
 %% Save as file
 output = struct();
 output.calls = all_calls;
