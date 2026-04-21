@@ -10,8 +10,12 @@ files = files(~startsWith({files.name}, "._"));
 % annoying to work with
 file_names = string({files.name});
 
-% Save all the data in a table, because they are fun to work with
+% Save all the data in a table
 output = table();
+if isempty(file_names)
+    return % return empty table if no matching filenames
+end
+
 output.file_names = file_names(:);
 
 % loop through each file and load it into the table
