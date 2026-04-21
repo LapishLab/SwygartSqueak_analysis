@@ -23,7 +23,7 @@ network = load(net_path);
 % Load training data for all folders (rows = detection files)
 training_data = table();
 for i=1:length(training_img_path)
-    training_data = cat(1, training_data, load_training_data(training_img_path));
+    training_data = cat(1, training_data, load_training_data(training_img_path(i)));
 end
 
 % split into validation and training
