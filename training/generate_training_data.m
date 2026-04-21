@@ -10,8 +10,11 @@ end
 
 %% Load all detection files (training & validation) and merge
 det_train = load_all_detection(train_path);
-det_val = load_all_detection(opts.val_path);
-
+if isfield(opts, "val_path")
+    det_val = load_all_detection(opts.val_path);
+else
+    det_val = table(); % use empty table if no validation folder is specified
+end
 all_det = cat(1, det_val, det_train);
 all_det.group = repmat("train", height(all_det), 1);
 all_det.group(1:height(det_val)) = repmat("validation", height(det_val), 1);
