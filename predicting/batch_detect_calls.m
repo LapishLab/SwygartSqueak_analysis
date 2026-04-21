@@ -8,6 +8,7 @@ function batch_detect_calls(audio_folder, output_folder, network)
     t.mat_names = strrep(t.audio_names, ".flac", ".mat");
     t.mat_paths = fullfile(output_folder,t.mat_names);
     
+    [~,~] = mkdir(output_folder);
     %% Check that file hasn't already been processed
     need_export = ~cellfun(@exist, t.mat_paths);
     t = t(need_export,:);
