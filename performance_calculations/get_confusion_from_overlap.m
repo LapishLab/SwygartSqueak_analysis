@@ -1,4 +1,4 @@
-function output = get_confusion_from_overlap(truth_box, test_box, opts)
+function [output, truth_labels, test_labels] = get_confusion_from_overlap(truth_box, test_box, opts)
 % calculate perfomance for single pair of truth/test detection files
     arguments
         truth_box double  % Truth boxes
@@ -31,4 +31,15 @@ function output = get_confusion_from_overlap(truth_box, test_box, opts)
     output.TP = {[TP_ind_truth ; TP_ind_test]'};
     output.FN = {FN_ind'}; 
     output.FP = {FP_ind'}; 
+    output.FP_box = test_box(FP_ind',:);
+    output.FN_box = truth_box(FN_ind', :);
+
+    truth_labels = strings(height(truth_box), 1);
+    truth_labels(TP_ind_truth)= "TP";
+    truth_labels(FN_ind)= "FN";
+
+
+    test_labels = strings(height(test_box), 1);
+    test_labels(TP_ind_test)="TP";
+    test_labels(FP_ind) = "FP";
 end
