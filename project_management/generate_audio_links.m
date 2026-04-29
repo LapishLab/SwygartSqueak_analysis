@@ -1,5 +1,6 @@
 % needs the split.csv file that classifies each data file as being used for model testing,
-% training or validation. Wherever this file is is where the audio links will be saved to  
+% training or validation. Wherever this file is is where the audio links will be saved to in 
+% audio file that is split into test, validation, and train
 
 function generate_audio_links(csvPath)
     % Validate input
@@ -11,7 +12,7 @@ function generate_audio_links(csvPath)
     T = readtable(csvPath, Delimiter=",");
 
     % Verify required columns
-    requiredCols = {'audio_file_path', 'split', 'subject'};
+    requiredCols = {'data_path', 'split', 'subject'};
     missingCols = setdiff(requiredCols, T.Properties.VariableNames);
     if ~isempty(missingCols)
         error('Missing required columns: %s', strjoin(missingCols, ', '));
@@ -27,7 +28,7 @@ function generate_audio_links(csvPath)
 
 
     % Validate audio_file_path
-    validPaths = isfile(T.audio_file_path);
+    validPaths = isfile(T.data_path);
     if any(~validPaths & ~skip)
         bad_lines = num2str(find(~validPaths));
         bad_lines = strjoin(string(bad_lines),'\n');
@@ -35,7 +36,7 @@ function generate_audio_links(csvPath)
     end
 
     % generate new file name by combining filename and subject #
-    [~, original_name, ext] = fileparts(T.audio_file_path);
+    [~, original_name, ext] = fileparts(T.data_path);
     fname = compose('%s_subject%s%s', ...
         string(original_name), ...
         T.subject, ...
@@ -58,7 +59,7 @@ function generate_audio_links(csvPath)
         if skip(i)
             continue;
         end
-        src = T.audio_file_path{i};
+        src = T.data_path{i};
         dest = T.link_name{i};
         try
             if isunix || ismac
