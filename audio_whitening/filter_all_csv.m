@@ -10,7 +10,7 @@ function filter_all_csv(csvPath)
     % save location for whitened audio data. Saved in the box#/mic folder
     % in datastar 
     [folder,name,~]=fileparts(T.data_path);
-    new_names = fullfile(folder,name+"_whitened.flac");
+    new_names = fullfile(folder,T.file_ID+"_whitened.flac");
 
     for i = 1:height(T)
         audioFile = T.link_name{i};
